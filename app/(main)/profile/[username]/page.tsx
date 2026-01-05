@@ -7,18 +7,22 @@ import { Button } from '@/components/ui/button'
 import { FollowButton } from '@/components/follow-button'
 import { PostCard } from '@/components/post-card'
 import { Image as ImageIcon } from 'lucide-react'
-import type { Post, Profile, Like, Repost } from '@prisma/client'
+import type { Prisma } from '@prisma/client'
 
-type PostWithRelations = Post & {
-  author: Profile
-  likes: Like[]
-  reposts: Repost[]
-  _count: {
-    likes: number
-    reposts: number
-    replies: number
+type PostWithRelations = Prisma.PostGetPayload<{
+  include: {
+    author: true
+    likes: true
+    reposts: true
+    _count: {
+      select: {
+        likes: true
+        reposts: true
+        replies: true
+      }
+    }
   }
-}
+}>
 
 export default async function UserProfilePage({
   params,
