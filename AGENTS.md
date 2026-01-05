@@ -5,6 +5,7 @@
 - AGENTS.md: このファイル
 - requirements.md: 要件定義
 - README: リポジトリ概要
+- docs/*.md: 各種仕様
 
 ## 実装方針
 
