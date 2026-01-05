@@ -18,12 +18,12 @@ export function Sidebar() {
   const pathname = usePathname()
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 border-r bg-background p-4 flex flex-col">
+    <aside className="fixed left-0 top-0 h-screen w-64 border-r bg-primary p-4 flex flex-col">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold">AIRIM</h1>
+        <h1 className="text-3xl font-bold text-white">AIRIM</h1>
       </div>
       
-      <nav className="flex-1 space-y-2">
+      <nav className="flex-1 space-y-2 text-white">
         {navItems.map((item) => {
           const Icon = item.icon
           const isActive = pathname === item.href
@@ -32,7 +32,7 @@ export function Sidebar() {
             <Link key={item.href} href={item.href}>
               <Button
                 variant={isActive ? 'secondary' : 'ghost'}
-                className="w-full justify-start gap-3"
+                className="w-full justify-start gap-3 text-lg"
               >
                 <Icon className="h-5 w-5" />
                 {item.label}
@@ -43,7 +43,10 @@ export function Sidebar() {
       </nav>
 
       <Link href="/compose" className="mb-4">
-        <Button className="w-full gap-2">
+        <Button
+          className="w-full gap-2"
+          variant="secondary"
+        >
           <PenSquare className="h-5 w-5" />
           投稿する
         </Button>

@@ -15,11 +15,11 @@ export function Timeline({ globalPosts, followingPosts, currentUserId }: Timelin
   return (
     <Tabs defaultValue="global" className="w-full">
       <TabsList className="w-full rounded-none border-b">
-        <TabsTrigger value="global" className="flex-1">
-          おすすめ
-        </TabsTrigger>
         <TabsTrigger value="following" className="flex-1">
           フォロー中
+        </TabsTrigger>
+        <TabsTrigger value="global" className="flex-1">
+          全体
         </TabsTrigger>
       </TabsList>
       

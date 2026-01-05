@@ -148,6 +148,7 @@ export function PostForm({ parentId, onSuccess, placeholder = '今何してる�
               </span>
               <Button
                 type="submit"
+                variant="secondary"
                 disabled={loading || uploading || isOverLimit || (!content.trim() && images.length === 0)}
               >
                 {loading ? '投稿中...' : '投稿'}
