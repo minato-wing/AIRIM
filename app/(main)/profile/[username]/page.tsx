@@ -7,6 +7,18 @@ import { Button } from '@/components/ui/button'
 import { FollowButton } from '@/components/follow-button'
 import { PostCard } from '@/components/post-card'
 import { Image as ImageIcon } from 'lucide-react'
+import type { Post, Profile, Like, Repost } from '@prisma/client'
+
+type PostWithRelations = Post & {
+  author: Profile
+  likes: Like[]
+  reposts: Repost[]
+  _count: {
+    likes: number
+    reposts: number
+    replies: number
+  }
+}
 
 export default async function UserProfilePage({
   params,
@@ -94,7 +106,7 @@ export default async function UserProfilePage({
       </div>
 
       <div>
-        {posts.map((post) => (
+        {posts.map((post: PostWithRelations) => (
           <PostCard key={post.id} post={post} currentUserId={currentProfile?.id} />
         ))}
       </div>

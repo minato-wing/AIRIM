@@ -5,6 +5,9 @@ import { PostCard } from '@/components/post-card'
 import { PostForm } from '@/components/post-form'
 import { Separator } from '@/components/ui/separator'
 
+type Post = NonNullable<Awaited<ReturnType<typeof getPost>>>
+type Reply = Post['replies'][number]
+
 export default async function PostDetailPage({
   params,
 }: {
@@ -54,7 +57,7 @@ export default async function PostDetailPage({
 
       {post.replies && post.replies.length > 0 ? (
         <div>
-          {post.replies.map((reply) => (
+          {post.replies.map((reply: Reply) => (
             <PostCard
               key={reply.id}
               post={reply}
