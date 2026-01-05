@@ -20,6 +20,8 @@ const notificationMessages = {
   reply: 'があなたの投稿に返信しました',
 }
 
+type Notification = Awaited<ReturnType<typeof getNotifications>>[number]
+
 export default async function NotificationsPage() {
   const notifications = await getNotifications()
 
@@ -36,7 +38,7 @@ export default async function NotificationsPage() {
 
       {notifications.length > 0 ? (
         <div>
-          {notifications.map((notification) => {
+          {notifications.map((notification: Notification) => {
             const Icon = notificationIcons[notification.type as keyof typeof notificationIcons]
             const message = notificationMessages[notification.type as keyof typeof notificationMessages]
 
