@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
 import { ja } from 'date-fns/locale'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Heart, Repeat2, MessageCircle, Trash2 } from 'lucide-react'
 import { PostWithAuthor } from '@/lib/types'
@@ -64,6 +64,7 @@ export function PostCard({ post, currentUserId, showParent = false }: PostCardPr
       <div className="flex gap-3">
         <Link href={`/profile/${post.author.username}`}>
           <Avatar>
+            <AvatarImage src={post.author.avatar || undefined} />
             <AvatarFallback>{post.author.name[0]}</AvatarFallback>
           </Avatar>
         </Link>

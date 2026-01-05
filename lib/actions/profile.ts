@@ -70,6 +70,8 @@ export async function updateProfile(data: {
   username?: string
   name?: string
   bio?: string
+  avatar?: string
+  header?: string
 }) {
   const { userId } = await auth()
   if (!userId) throw new Error('Unauthorized')
@@ -80,6 +82,7 @@ export async function updateProfile(data: {
   })
 
   revalidatePath('/profile')
+  revalidatePath(`/profile/${profile.username}`)
   return profile
 }
 
