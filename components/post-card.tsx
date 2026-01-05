@@ -5,7 +5,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { ja } from 'date-fns/locale'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { Heart, Repeat2, MessageCircle, Trash2 } from 'lucide-react'
+import { Star, Repeat2, MessageCircle, Trash2 } from 'lucide-react'
 import { PostWithAuthor } from '@/lib/types'
 import { toggleLike, toggleRepost } from '@/lib/actions/interaction'
 import { deletePost } from '@/lib/actions/post'
@@ -131,10 +131,10 @@ export function PostCard({ post, currentUserId, showParent = false }: PostCardPr
             <Button
               variant="ghost"
               size="sm"
-              className={`gap-2 ${isLiked ? 'text-red-500' : ''}`}
+              className={`gap-2 ${isLiked ? 'text-yellow-500' : ''}`}
               onClick={handleLike}
             >
-              <Heart className={`h-4 w-4 ${isLiked ? 'fill-current' : ''}`} />
+              <Star className={`h-4 w-4 ${isLiked ? 'fill-current' : ''}`} />
               <span className="text-sm">{likeCount}</span>
             </Button>
           </div>
