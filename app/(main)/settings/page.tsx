@@ -35,18 +35,23 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-4 space-y-6">
+    <div className="max-w-5xl mx-auto p-4 space-y-6">
       <h1 className="text-2xl font-bold">設定</h1>
 
       <Card>
         <CardHeader>
           <CardTitle>アカウント設定</CardTitle>
           <CardDescription>
-            プロフィール画像、メールアドレス、パスワードなどの基本設定
+            メールアドレス、パスワードなどの基本設定
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <UserProfile />
+        <CardContent className="min-w-full">
+          <style jsx global>{`
+            .cl-internal-shxxyl {
+              display: none;
+            }
+          `}</style>
+            <UserProfile />
         </CardContent>
       </Card>
 
