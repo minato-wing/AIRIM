@@ -17,6 +17,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "AIRIM - Twitter-like SNS",
   description: "A Twitter-like social networking service",
+  icons: {
+    icon: "/airim_icon.svg",
+  },
 };
 
 export default function RootLayout({
