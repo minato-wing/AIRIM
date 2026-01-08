@@ -1,15 +1,18 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { updateProfile } from '@/lib/actions/profile'
 import { uploadProfileImage } from '@/lib/actions/upload'
+import { getAllTags } from '@/lib/actions/tag'
 import { Camera, Image as ImageIcon } from 'lucide-react'
+import type { Tag } from '@prisma/client'
 
 interface ProfileEditFormProps {
   profile: {
@@ -18,6 +21,7 @@ interface ProfileEditFormProps {
     bio: string
     avatar?: string | null
     header?: string | null
+    tagId?: string | null
   }
 }
 
@@ -25,11 +29,13 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const [tags, setTags] = useState<Tag[]>([])
   const [formData, setFormData] = useState({
     name: profile.name,
     bio: profile.bio,
     avatar: profile.avatar || '',
     header: profile.header || '',
+    tagId: profile.tagId || '',
   })
   const [avatarPreview, setAvatarPreview] = useState(profile.avatar || '')
   const [headerPreview, setHeaderPreview] = useState(profile.header || '')
@@ -38,6 +44,18 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
 
   const avatarInputRef = useRef<HTMLInputElement>(null)
   const headerInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    const loadTags = async () => {
+      try {
+        const allTags = await getAllTags()
+        setTags(allTags)
+      } catch (err) {
+        console.error('Failed to load tags:', err)
+      }
+    }
+    loadTags()
+  }, [])
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -100,6 +118,7 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
         bio: formData.bio,
         avatar: formData.avatar || undefined,
         header: formData.header || undefined,
+        tagId: formData.tagId || null,
       })
       router.push(`/profile/${profile.username}`)
       router.refresh()
@@ -201,6 +220,30 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
             onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
             rows={4}
           />
+        </div>
+
+        <div>
+          <Label>タグ</Label>
+          <RadioGroup
+            value={formData.tagId}
+            onValueChange={(value) => setFormData({ ...formData, tagId: value })}
+            className="mt-2"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="" id="tag-none" />
+              <Label htmlFor="tag-none" className="font-normal cursor-pointer">
+                タグなし
+              </Label>
+            </div>
+            {tags.map((tag) => (
+              <div key={tag.id} className="flex items-center space-x-2">
+                <RadioGroupItem value={tag.id} id={`tag-${tag.id}`} />
+                <Label htmlFor={`tag-${tag.id}`} className="font-normal cursor-pointer">
+                  {tag.displayName}
+                </Label>
+              </div>
+            ))}
+          </RadioGroup>
         </div>
 
         <div>

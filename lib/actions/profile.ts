@@ -72,9 +72,20 @@ export async function updateProfile(data: {
   bio?: string
   avatar?: string
   header?: string
+  tagId?: string | null
 }) {
   const { userId } = await auth()
   if (!userId) throw new Error('Unauthorized')
+
+  // tagIdが指定されている場合、存在確認
+  if (data.tagId !== undefined && data.tagId !== null) {
+    const tagExists = await prisma.tag.findUnique({
+      where: { id: data.tagId },
+    })
+    if (!tagExists) {
+      throw new Error('指定されたタグが存在しません')
+    }
+  }
 
   const profile = await prisma.profile.update({
     where: { clerkId: userId },
@@ -90,6 +101,7 @@ export async function getProfileByUsername(username: string) {
   const profile = await prisma.profile.findUnique({
     where: { username },
     include: {
+      tag: true,
       _count: {
         select: {
           followers: true,
@@ -110,6 +122,7 @@ export async function getCurrentProfile() {
   const profile = await prisma.profile.findUnique({
     where: { clerkId: userId },
     include: {
+      tag: true,
       _count: {
         select: {
           followers: true,
@@ -123,13 +136,31 @@ export async function getCurrentProfile() {
   return profile
 }
 
-export async function searchProfiles(query: string) {
+export async function searchProfiles(params: {
+  query?: string
+  tagIds?: string[]
+}) {
+  const { query, tagIds } = params
+  
+  const whereConditions: any = {}
+  
+  // テキスト検索条件
+  if (query && query.trim()) {
+    whereConditions.OR = [
+      { username: { contains: query, mode: 'insensitive' } },
+      { name: { contains: query, mode: 'insensitive' } },
+    ]
+  }
+  
+  // タグ検索条件
+  if (tagIds && tagIds.length > 0) {
+    whereConditions.tagId = { in: tagIds }
+  }
+  
   const profiles = await prisma.profile.findMany({
-    where: {
-      OR: [
-        { username: { contains: query, mode: 'insensitive' } },
-        { name: { contains: query, mode: 'insensitive' } },
-      ],
+    where: Object.keys(whereConditions).length > 0 ? whereConditions : undefined,
+    include: {
+      tag: true,
     },
     take: 20,
   })

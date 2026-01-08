@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { FollowButton } from '@/components/follow-button'
 import { PostCard } from '@/components/post-card'
+import { TagBadge } from '@/components/tag-badge'
 import { Image as ImageIcon } from 'lucide-react'
 import type { Prisma } from '@prisma/client'
 
@@ -86,6 +87,11 @@ export default async function UserProfilePage({
                 <div>
                   <h1 className="text-2xl font-bold">{profile.name}</h1>
                   <p className="text-muted-foreground">@{profile.username}</p>
+                  {profile.tag && (
+                    <div className="mt-2">
+                      <TagBadge tag={profile.tag} size="md" />
+                    </div>
+                  )}
                 </div>
                 {isOwnProfile ? (
                   <Link href="/profile/edit">
