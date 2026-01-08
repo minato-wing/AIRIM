@@ -26,7 +26,13 @@ export function Sidebar() {
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 border-r bg-primary p-4 flex flex-col">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white">AIRIM</h1>
+        <Image
+          src="/airim_logo.svg"
+          alt="AIRIM"
+          width={120}
+          height={40}
+          priority
+        />
       </div>
       
       <nav className="flex-1 space-y-2 text-white">
