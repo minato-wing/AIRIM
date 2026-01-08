@@ -1,10 +1,11 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { Home, Search, Bell, Settings, User, PenSquare } from 'lucide-react'
+import { Home, Search, Bell, Settings, User, PenSquare, LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { UserButton } from '@clerk/nextjs'
+import { useClerk } from '@clerk/nextjs'
 
 const navItems = [
   { href: '/home', label: 'ホーム', icon: Home },
@@ -16,6 +17,11 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname()
+  const { signOut } = useClerk()
+
+  const handleSignOut = async () => {
+    await signOut({ redirectUrl: '/sign-in' })
+  }
 
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 border-r bg-primary p-4 flex flex-col">
@@ -53,7 +59,14 @@ export function Sidebar() {
       </Link>
 
       <div className="border-t pt-4">
-        <UserButton afterSignOutUrl="/sign-in" />
+        <Button
+          onClick={handleSignOut}
+          variant="ghost"
+          className="w-full justify-start gap-3 text-lg text-white"
+        >
+          <LogOut className="h-5 w-5" />
+          ログアウト
+        </Button>
       </div>
     </aside>
   )

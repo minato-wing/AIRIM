@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkProvider } from '@clerk/nextjs'
+import { jaJP } from '@clerk/localizations'
 import "./globals.css";
 
 const geistSans = Geist({
@@ -16,6 +17,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "AIRIM - Twitter-like SNS",
   description: "A Twitter-like social networking service",
+  icons: {
+    icon: "/airim_icon.svg",
+  },
 };
 
 export default function RootLayout({
@@ -24,8 +28,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html lang="en">
+    <ClerkProvider localization={jaJP}>
+      <html lang="ja">
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >

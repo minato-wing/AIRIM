@@ -14,9 +14,11 @@ model Profile {
   bio       String   @default("")
   avatar    String?
   header    String?
+  tagId     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  tag       Tag?     @relation(fields: [tagId], references: [id])
   posts         Post[]
   likes         Like[]
   reposts       Repost[]
@@ -27,6 +29,7 @@ model Profile {
 
   @@index([username])
   @@index([clerkId])
+  @@index([tagId])
 }
 
 model Post {
@@ -128,4 +131,15 @@ model NotificationSettings {
   onLike    Boolean @default(true)
   onRepost  Boolean @default(true)
   onReply   Boolean @default(true)
+}
+
+model Tag {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  displayName String
+  createdAt   DateTime  @default(now())
+  
+  profiles    Profile[]
+  
+  @@index([name])
 }
