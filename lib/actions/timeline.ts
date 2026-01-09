@@ -4,14 +4,32 @@ import { auth } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/prisma'
 
 export async function getGlobalTimeline(cursor?: string, limit: number = 20) {
-  const posts = await prisma.post.findMany({
+  const { userId } = await auth()
+  
+  const profile = userId ? await prisma.profile.findUnique({
+    where: { clerkId: userId },
+    select: { id: true },
+  }) : null
+
+  // Get posts without likes/reposts subqueries
+  const rawPosts = await prisma.post.findMany({
     where: {
       parentId: null,
     },
-    include: {
-      author: true,
-      likes: true,
-      reposts: true,
+    select: {
+      id: true,
+      content: true,
+      images: true,
+      authorId: true,
+      createdAt: true,
+      author: {
+        select: {
+          id: true,
+          username: true,
+          name: true,
+          avatar: true,
+        },
+      },
       _count: {
         select: {
           likes: true,
@@ -28,7 +46,43 @@ export async function getGlobalTimeline(cursor?: string, limit: number = 20) {
     }),
   })
 
-  return posts
+  if (!profile || rawPosts.length === 0) {
+    return rawPosts.map(post => ({
+      ...post,
+      likes: [],
+      reposts: [],
+    }))
+  }
+
+  // Batch fetch user's likes and reposts
+  const postIds = rawPosts.map(p => p.id)
+  const [userLikes, userReposts] = await Promise.all([
+    prisma.like.findMany({
+      where: {
+        userId: profile.id,
+        postId: { in: postIds },
+      },
+      select: { postId: true, userId: true },
+    }),
+    prisma.repost.findMany({
+      where: {
+        userId: profile.id,
+        postId: { in: postIds },
+      },
+      select: { postId: true, userId: true },
+    }),
+  ])
+
+  // Create lookup maps
+  const likeMap = new Set(userLikes.map(l => l.postId))
+  const repostMap = new Set(userReposts.map(r => r.postId))
+
+  // Combine data
+  return rawPosts.map(post => ({
+    ...post,
+    likes: likeMap.has(post.id) ? [{ userId: profile.id }] : [],
+    reposts: repostMap.has(post.id) ? [{ userId: profile.id }] : [],
+  }))
 }
 
 export async function getFollowingTimeline(cursor?: string, limit: number = 20) {
@@ -37,7 +91,8 @@ export async function getFollowingTimeline(cursor?: string, limit: number = 20) 
 
   const profile = await prisma.profile.findUnique({
     where: { clerkId: userId },
-    include: {
+    select: {
+      id: true,
       following: {
         select: { followingId: true },
       },
@@ -48,17 +103,28 @@ export async function getFollowingTimeline(cursor?: string, limit: number = 20) 
 
   const followingIds = profile.following.map((f) => f.followingId)
 
-  const posts = await prisma.post.findMany({
+  // Get posts without likes/reposts subqueries
+  const rawPosts = await prisma.post.findMany({
     where: {
       parentId: null,
       authorId: {
         in: [...followingIds, profile.id],
       },
     },
-    include: {
-      author: true,
-      likes: true,
-      reposts: true,
+    select: {
+      id: true,
+      content: true,
+      images: true,
+      authorId: true,
+      createdAt: true,
+      author: {
+        select: {
+          id: true,
+          username: true,
+          name: true,
+          avatar: true,
+        },
+      },
       _count: {
         select: {
           likes: true,
@@ -75,5 +141,37 @@ export async function getFollowingTimeline(cursor?: string, limit: number = 20) 
     }),
   })
 
-  return posts
+  if (rawPosts.length === 0) {
+    return []
+  }
+
+  // Batch fetch user's likes and reposts
+  const postIds = rawPosts.map(p => p.id)
+  const [userLikes, userReposts] = await Promise.all([
+    prisma.like.findMany({
+      where: {
+        userId: profile.id,
+        postId: { in: postIds },
+      },
+      select: { postId: true, userId: true },
+    }),
+    prisma.repost.findMany({
+      where: {
+        userId: profile.id,
+        postId: { in: postIds },
+      },
+      select: { postId: true, userId: true },
+    }),
+  ])
+
+  // Create lookup maps
+  const likeMap = new Set(userLikes.map(l => l.postId))
+  const repostMap = new Set(userReposts.map(r => r.postId))
+
+  // Combine data
+  return rawPosts.map(post => ({
+    ...post,
+    likes: likeMap.has(post.id) ? [{ userId: profile.id }] : [],
+    reposts: repostMap.has(post.id) ? [{ userId: profile.id }] : [],
+  }))
 }

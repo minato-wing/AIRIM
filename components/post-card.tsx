@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { formatDistanceToNow } from 'date-fns'
 import { ja } from 'date-fns/locale'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -9,7 +10,7 @@ import { Star, Repeat2, MessageCircle, Trash2 } from 'lucide-react'
 import { PostWithAuthor } from '@/lib/types'
 import { toggleLike, toggleRepost } from '@/lib/actions/interaction'
 import { deletePost } from '@/lib/actions/post'
-import { useState } from 'react'
+import { useState, memo, useCallback, useMemo } from 'react'
 
 interface PostCardProps {
   post: PostWithAuthor
@@ -17,7 +18,7 @@ interface PostCardProps {
   showParent?: boolean
 }
 
-export function PostCard({ post, currentUserId, showParent = false }: PostCardProps) {
+export const PostCard = memo(function PostCard({ post, currentUserId }: PostCardProps) {
   const [isLiked, setIsLiked] = useState(
     post.likes.some((like) => like.userId === currentUserId)
   )
@@ -28,8 +29,13 @@ export function PostCard({ post, currentUserId, showParent = false }: PostCardPr
   const [repostCount, setRepostCount] = useState(post._count?.reposts || 0)
 
   const isOwnPost = post.authorId === currentUserId
+  
+  const formattedDate = useMemo(
+    () => formatDistanceToNow(new Date(post.createdAt), { addSuffix: true, locale: ja }),
+    [post.createdAt]
+  )
 
-  const handleLike = async () => {
+  const handleLike = useCallback(async () => {
     try {
       await toggleLike(post.id)
       setIsLiked(!isLiked)
@@ -37,9 +43,9 @@ export function PostCard({ post, currentUserId, showParent = false }: PostCardPr
     } catch (error) {
       console.error('Failed to toggle like:', error)
     }
-  }
+  }, [post.id, isLiked, likeCount])
 
-  const handleRepost = async () => {
+  const handleRepost = useCallback(async () => {
     try {
       await toggleRepost(post.id)
       setIsReposted(!isReposted)
@@ -47,9 +53,9 @@ export function PostCard({ post, currentUserId, showParent = false }: PostCardPr
     } catch (error) {
       console.error('Failed to toggle repost:', error)
     }
-  }
+  }, [post.id, isReposted, repostCount])
 
-  const handleDelete = async () => {
+  const handleDelete = useCallback(async () => {
     if (!confirm('この投稿を削除しますか？')) return
     try {
       await deletePost(post.id)
@@ -57,7 +63,7 @@ export function PostCard({ post, currentUserId, showParent = false }: PostCardPr
       console.error('Failed to delete post:', error)
       alert('投稿の削除に失敗しました')
     }
-  }
+  }, [post.id])
 
   return (
     <article className="border-b p-4 hover:bg-muted/50 transition-colors">
@@ -79,7 +85,7 @@ export function PostCard({ post, currentUserId, showParent = false }: PostCardPr
             </Link>
             <span className="text-muted-foreground text-sm">·</span>
             <span className="text-muted-foreground text-sm">
-              {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true, locale: ja })}
+              {formattedDate}
             </span>
             {isOwnPost && (
               <Button
@@ -99,12 +105,15 @@ export function PostCard({ post, currentUserId, showParent = false }: PostCardPr
             {post.images.length > 0 && (
               <div className={`mt-3 grid gap-2 ${post.images.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
                 {post.images.map((url, index) => (
-                  <img
-                    key={index}
-                    src={url}
-                    alt={`Image ${index + 1}`}
-                    className="rounded-lg object-cover w-full h-64"
-                  />
+                  <div key={index} className="relative w-full h-64">
+                    <Image
+                      src={url}
+                      alt={`Image ${index + 1}`}
+                      fill
+                      className="rounded-lg object-cover"
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                    />
+                  </div>
                 ))}
               </div>
             )}
@@ -142,4 +151,4 @@ export function PostCard({ post, currentUserId, showParent = false }: PostCardPr
       </div>
     </article>
   )
-}
+})
