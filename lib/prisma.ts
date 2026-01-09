@@ -8,7 +8,7 @@ const globalForPrisma = globalThis as unknown as {
 
 function createPrismaClient() {
   const connectionString = process.env.DATABASE_URL
-  
+
   if (!connectionString) {
     throw new Error('DATABASE_URL is not defined')
   }
@@ -20,10 +20,10 @@ function createPrismaClient() {
     connectionTimeoutMillis: 2000,
   })
   const adapter = new PrismaPg(pool)
-  
-  return new PrismaClient({ 
+
+  return new PrismaClient({
     adapter,
-    log: process.env.NODE_ENV === 'development' 
+    log: process.env.NODE_ENV === 'development'
       ? [
           { emit: 'event', level: 'query' },
           { emit: 'stdout', level: 'error' },
@@ -37,11 +37,11 @@ export const prisma = globalForPrisma.prisma ?? createPrismaClient()
 
 if (process.env.NODE_ENV !== 'production') {
   globalForPrisma.prisma = prisma
-  
+
   // Log slow queries in development
   prisma.$on('query' as never, (e: any) => {
-    if (e.duration > 100) {
-      console.log(`[Prisma] Slow query (${e.duration}ms):`, e.query.substring(0, 100))
+    if (e.duration > 900) {
+      console.log(`[Prisma] Slow query (${e.duration}ms):`, e.query.substring(0, 1500))
     }
   })
 }
