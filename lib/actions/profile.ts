@@ -100,8 +100,23 @@ export async function updateProfile(data: {
 export async function getProfileByUsername(username: string) {
   const profile = await prisma.profile.findUnique({
     where: { username },
-    include: {
-      tag: true,
+    select: {
+      id: true,
+      clerkId: true,
+      username: true,
+      name: true,
+      bio: true,
+      avatar: true,
+      header: true,
+      tagId: true,
+      createdAt: true,
+      tag: {
+        select: {
+          id: true,
+          name: true,
+          displayName: true,
+        },
+      },
       _count: {
         select: {
           followers: true,
@@ -121,8 +136,23 @@ export async function getCurrentProfile() {
 
   const profile = await prisma.profile.findUnique({
     where: { clerkId: userId },
-    include: {
-      tag: true,
+    select: {
+      id: true,
+      clerkId: true,
+      username: true,
+      name: true,
+      bio: true,
+      avatar: true,
+      header: true,
+      tagId: true,
+      createdAt: true,
+      tag: {
+        select: {
+          id: true,
+          name: true,
+          displayName: true,
+        },
+      },
       _count: {
         select: {
           followers: true,
@@ -141,9 +171,9 @@ export async function searchProfiles(params: {
   tagIds?: string[]
 }) {
   const { query, tagIds } = params
-  
+
   const whereConditions: any = {}
-  
+
   // テキスト検索条件
   if (query && query.trim()) {
     whereConditions.OR = [
@@ -151,16 +181,27 @@ export async function searchProfiles(params: {
       { name: { contains: query, mode: 'insensitive' } },
     ]
   }
-  
+
   // タグ検索条件
   if (tagIds && tagIds.length > 0) {
     whereConditions.tagId = { in: tagIds }
   }
-  
+
   const profiles = await prisma.profile.findMany({
     where: Object.keys(whereConditions).length > 0 ? whereConditions : undefined,
-    include: {
-      tag: true,
+    select: {
+      id: true,
+      username: true,
+      name: true,
+      bio: true,
+      avatar: true,
+      tag: {
+        select: {
+          id: true,
+          name: true,
+          displayName: true,
+        },
+      },
     },
     take: 20,
   })

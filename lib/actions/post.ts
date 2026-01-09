@@ -104,17 +104,61 @@ export async function deletePost(postId: string) {
 }
 
 export async function getPost(postId: string) {
+  const { userId } = await auth()
+  
+  const profile = userId ? await prisma.profile.findUnique({
+    where: { clerkId: userId },
+    select: { id: true },
+  }) : null
+
   const post = await prisma.post.findUnique({
     where: { id: postId },
-    include: {
-      author: true,
-      likes: true,
-      reposts: true,
+    select: {
+      id: true,
+      content: true,
+      images: true,
+      authorId: true,
+      parentId: true,
+      createdAt: true,
+      author: {
+        select: {
+          id: true,
+          username: true,
+          name: true,
+          avatar: true,
+        },
+      },
+      likes: profile ? {
+        where: { userId: profile.id },
+        select: { userId: true },
+      } : false,
+      reposts: profile ? {
+        where: { userId: profile.id },
+        select: { userId: true },
+      } : false,
       parent: {
-        include: {
-          author: true,
-          likes: true,
-          reposts: true,
+        select: {
+          id: true,
+          content: true,
+          images: true,
+          authorId: true,
+          createdAt: true,
+          author: {
+            select: {
+              id: true,
+              username: true,
+              name: true,
+              avatar: true,
+            },
+          },
+          likes: profile ? {
+            where: { userId: profile.id },
+            select: { userId: true },
+          } : false,
+          reposts: profile ? {
+            where: { userId: profile.id },
+            select: { userId: true },
+          } : false,
           _count: {
             select: {
               likes: true,
@@ -125,10 +169,28 @@ export async function getPost(postId: string) {
         },
       },
       replies: {
-        include: {
-          author: true,
-          likes: true,
-          reposts: true,
+        select: {
+          id: true,
+          content: true,
+          images: true,
+          authorId: true,
+          createdAt: true,
+          author: {
+            select: {
+              id: true,
+              username: true,
+              name: true,
+              avatar: true,
+            },
+          },
+          likes: profile ? {
+            where: { userId: profile.id },
+            select: { userId: true },
+          } : false,
+          reposts: profile ? {
+            where: { userId: profile.id },
+            select: { userId: true },
+          } : false,
           _count: {
             select: {
               likes: true,

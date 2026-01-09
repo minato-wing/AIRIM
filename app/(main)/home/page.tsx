@@ -3,6 +3,8 @@ import { Timeline } from '@/components/timeline'
 import { getGlobalTimeline, getFollowingTimeline } from '@/lib/actions/timeline'
 import { getCurrentProfile } from '@/lib/actions/profile'
 
+export const revalidate = 10 // Cache for 10 seconds
+
 export default async function HomePage() {
   const [globalPosts, followingPosts, currentProfile] = await Promise.all([
     getGlobalTimeline(),

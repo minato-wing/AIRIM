@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { getProfileByUsername, getCurrentProfile } from '@/lib/actions/profile'
 import { prisma } from '@/lib/prisma'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -8,22 +9,9 @@ import { FollowButton } from '@/components/follow-button'
 import { PostCard } from '@/components/post-card'
 import { TagBadge } from '@/components/tag-badge'
 import { Image as ImageIcon } from 'lucide-react'
-import type { Prisma } from '@prisma/client'
+import type { PostWithAuthor } from '@/lib/types'
 
-type PostWithRelations = Prisma.PostGetPayload<{
-  include: {
-    author: true
-    likes: true
-    reposts: true
-    _count: {
-      select: {
-        likes: true
-        reposts: true
-        replies: true
-      }
-    }
-  }
-}>
+export const revalidate = 30 // Cache for 30 seconds
 
 export default async function UserProfilePage({
   params,
@@ -31,8 +19,16 @@ export default async function UserProfilePage({
   params: Promise<{ username: string }>
 }) {
   const { username } = await params
-  const profile = await getProfileByUsername(username)
-  const currentProfile = await getCurrentProfile()
+  
+  const startTime = Date.now()
+  
+  // Parallel execution of all queries
+  const profileStart = Date.now()
+  const [profile, currentProfile] = await Promise.all([
+    getProfileByUsername(username),
+    getCurrentProfile(),
+  ])
+  console.log(`[Profile Page] Profile queries: ${Date.now() - profileStart}ms`)
 
   if (!profile) {
     notFound()
@@ -40,22 +36,107 @@ export default async function UserProfilePage({
 
   const isOwnProfile = currentProfile?.id === profile.id
 
-  const posts = await prisma.post.findMany({
-    where: { authorId: profile.id },
-    include: {
-      author: true,
-      likes: true,
-      reposts: true,
-      _count: {
-        select: {
-          likes: true,
-          reposts: true,
-          replies: true,
+  // Get posts with limit and optimized query
+  const postsStart = Date.now()
+  
+  // First, get posts without likes/reposts subqueries
+  const [rawPosts, isFollowingUser, userLikes, userReposts] = await Promise.all([
+    prisma.post.findMany({
+      where: { authorId: profile.id },
+      select: {
+        id: true,
+        content: true,
+        images: true,
+        authorId: true,
+        createdAt: true,
+        author: {
+          select: {
+            id: true,
+            username: true,
+            name: true,
+            avatar: true,
+          },
+        },
+        _count: {
+          select: {
+            likes: true,
+            reposts: true,
+            replies: true,
+          },
         },
       },
-    },
-    orderBy: { createdAt: 'desc' },
-  })
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+    }),
+    // Pre-fetch follow status for FollowButton
+    currentProfile && !isOwnProfile
+      ? prisma.follow.findUnique({
+          where: {
+            followerId_followingId: {
+              followerId: currentProfile.id,
+              followingId: profile.id,
+            },
+          },
+          select: { id: true },
+        })
+      : Promise.resolve(null),
+    // Batch fetch user's likes for all posts
+    currentProfile
+      ? prisma.like.findMany({
+          where: {
+            userId: currentProfile.id,
+            postId: { in: [] }, // Will be filled after we get post IDs
+          },
+          select: { postId: true, userId: true },
+        })
+      : Promise.resolve([]),
+    // Batch fetch user's reposts for all posts
+    currentProfile
+      ? prisma.repost.findMany({
+          where: {
+            userId: currentProfile.id,
+            postId: { in: [] }, // Will be filled after we get post IDs
+          },
+          select: { postId: true, userId: true },
+        })
+      : Promise.resolve([]),
+  ])
+  
+  // Now fetch likes and reposts for the actual posts
+  const postIds = rawPosts.map(p => p.id)
+  const [actualLikes, actualReposts] = currentProfile && postIds.length > 0
+    ? await Promise.all([
+        prisma.like.findMany({
+          where: {
+            userId: currentProfile.id,
+            postId: { in: postIds },
+          },
+          select: { postId: true, userId: true },
+        }),
+        prisma.repost.findMany({
+          where: {
+            userId: currentProfile.id,
+            postId: { in: postIds },
+          },
+          select: { postId: true, userId: true },
+        }),
+      ])
+    : [[], []]
+  
+  // Create lookup maps
+  const likeMap = new Set(actualLikes.map(l => l.postId))
+  const repostMap = new Set(actualReposts.map(r => r.postId))
+  
+  // Combine data
+  const posts = rawPosts.map(post => ({
+    ...post,
+    likes: likeMap.has(post.id) ? [{ userId: currentProfile!.id }] : [],
+    reposts: repostMap.has(post.id) ? [{ userId: currentProfile!.id }] : [],
+  }))
+  
+  console.log(`[Profile Page] Posts query: ${Date.now() - postsStart}ms`)
+  console.log(`[Profile Page] Total time: ${Date.now() - startTime}ms`)
+  console.log(`[Profile Page] Posts count: ${posts.length}`)
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -63,10 +144,13 @@ export default async function UserProfilePage({
         {/* Header Image */}
         <div className="w-full h-48 bg-muted relative">
           {profile.header ? (
-            <img
+            <Image
               src={profile.header}
               alt="Header"
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 672px"
+              priority
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
@@ -98,7 +182,7 @@ export default async function UserProfilePage({
                     <Button variant="outline">プロフィール編集</Button>
                   </Link>
                 ) : currentProfile ? (
-                  <FollowButton profileId={profile.id} />
+                  <FollowButton profileId={profile.id} initialFollowing={!!isFollowingUser} />
                 ) : null}
               </div>
             </div>
@@ -116,7 +200,7 @@ export default async function UserProfilePage({
       </div>
 
       <div>
-        {posts.map((post: PostWithRelations) => (
+        {posts.map((post) => (
           <PostCard key={post.id} post={post} currentUserId={currentProfile?.id} />
         ))}
       </div>

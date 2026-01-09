@@ -11,9 +11,20 @@ import { TagBadge } from '@/components/tag-badge'
 import { searchProfiles } from '@/lib/actions/profile'
 import { getAllTags } from '@/lib/actions/tag'
 import { Search as SearchIcon } from 'lucide-react'
-import type { Profile, Tag } from '@prisma/client'
+import type { Tag } from '@prisma/client'
 
-type ProfileWithTag = Profile & { tag: Tag | null }
+type ProfileWithTag = {
+  id: string
+  username: string
+  name: string
+  bio: string
+  avatar: string | null
+  tag: {
+    id: string
+    name: string
+    displayName: string
+  } | null
+}
 
 export default function SearchPage() {
   const [query, setQuery] = useState('')

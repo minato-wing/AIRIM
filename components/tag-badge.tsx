@@ -1,7 +1,9 @@
-import type { Tag } from '@prisma/client'
-
 interface TagBadgeProps {
-  tag: Tag
+  tag: {
+    id: string
+    name: string
+    displayName: string
+  }
   size?: 'sm' | 'md'
 }
 

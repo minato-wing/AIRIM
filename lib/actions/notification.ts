@@ -10,15 +10,32 @@ export async function getNotifications() {
 
   const profile = await prisma.profile.findUnique({
     where: { clerkId: userId },
+    select: { id: true },
   })
 
   if (!profile) throw new Error('Profile not found')
 
   const notifications = await prisma.notification.findMany({
     where: { recipientId: profile.id },
-    include: {
-      actor: true,
-      post: true,
+    select: {
+      id: true,
+      type: true,
+      read: true,
+      createdAt: true,
+      actor: {
+        select: {
+          id: true,
+          username: true,
+          name: true,
+          avatar: true,
+        },
+      },
+      post: {
+        select: {
+          id: true,
+          content: true,
+        },
+      },
     },
     orderBy: { createdAt: 'desc' },
     take: 50,

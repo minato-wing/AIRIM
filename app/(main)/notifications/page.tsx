@@ -45,7 +45,7 @@ export default async function NotificationsPage() {
             return (
               <Link
                 key={notification.id}
-                href={notification.postId ? `/post/${notification.postId}` : `/profile/${notification.actor.username}`}
+                href={notification.post?.id ? `/post/${notification.post.id}` : `/profile/${notification.actor.username}`}
                 className={`block border-b p-4 hover:bg-muted/50 transition-colors ${
                   !notification.read ? 'bg-blue-50/50' : ''
                 }`}
