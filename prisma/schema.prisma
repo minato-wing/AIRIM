@@ -14,11 +14,10 @@ model Profile {
   bio       String   @default("")
   avatar    String?
   header    String?
-  tagId     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  tag       Tag?     @relation(fields: [tagId], references: [id])
+  tags      ProfileTag[]
   posts         Post[]
   likes         Like[]
   reposts       Repost[]
@@ -29,7 +28,6 @@ model Profile {
 
   @@index([username])
   @@index([clerkId])
-  @@index([tagId])
 }
 
 model Post {
@@ -139,7 +137,21 @@ model Tag {
   displayName String
   createdAt   DateTime  @default(now())
   
-  profiles    Profile[]
+  profiles    ProfileTag[]
   
   @@index([name])
+}
+
+model ProfileTag {
+  id        String   @id @default(cuid())
+  profileId String
+  tagId     String
+  createdAt DateTime @default(now())
+  
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  tag       Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  
+  @@unique([profileId, tagId])
+  @@index([profileId])
+  @@index([tagId])
 }

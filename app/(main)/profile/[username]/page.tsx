@@ -87,9 +87,11 @@ export default async function UserProfilePage({
                 <div>
                   <h1 className="text-2xl font-bold">{profile.name}</h1>
                   <p className="text-muted-foreground">@{profile.username}</p>
-                  {profile.tag && (
-                    <div className="mt-2">
-                      <TagBadge tag={profile.tag} size="md" />
+                  {profile.tags && profile.tags.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {profile.tags.map((pt) => (
+                        <TagBadge key={pt.tag.id} tag={pt.tag} size="md" />
+                      ))}
                     </div>
                   )}
                 </div>

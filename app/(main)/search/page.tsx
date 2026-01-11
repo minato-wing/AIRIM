@@ -13,7 +13,20 @@ import { getAllTags } from '@/lib/actions/tag'
 import { Search as SearchIcon } from 'lucide-react'
 import type { Profile, Tag } from '@prisma/client'
 
-type ProfileWithTag = Profile & { tag: Tag | null }
+type ProfileWithTag = {
+  id: string
+  username: string
+  name: string
+  bio: string
+  avatar: string | null
+  tags: Array<{
+    tag: {
+      id: string
+      name: string
+      displayName: string
+    }
+  }>
+}
 
 export default function SearchPage() {
   const [query, setQuery] = useState('')
@@ -124,9 +137,11 @@ export default function SearchPage() {
                   <p className="text-sm text-muted-foreground truncate">
                     @{profile.username}
                   </p>
-                  {profile.tag && (
-                    <div className="mt-1">
-                      <TagBadge tag={profile.tag} />
+                  {profile.tags && profile.tags.length > 0 && (
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {profile.tags.map((pt) => (
+                        <TagBadge key={pt.tag.id} tag={pt.tag} />
+                      ))}
                     </div>
                   )}
                   {profile.bio && (
