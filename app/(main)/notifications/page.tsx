@@ -26,12 +26,12 @@ export default async function NotificationsPage() {
   const notifications = await getNotifications()
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="border-b p-4 flex items-center justify-between">
-        <h2 className="text-xl font-bold">通知</h2>
+    <div className="w-full max-w-2xl mx-auto pb-20 md:pb-0">
+      <div className="border-b p-3 md:p-4 flex items-center justify-between">
+        <h2 className="text-lg md:text-xl font-bold">通知</h2>
         <form action={markAllNotificationsAsRead}>
-          <Button variant="ghost" size="sm" type="submit">
-            すべて既読にする
+          <Button variant="ghost" size="sm" type="submit" className="text-xs md:text-sm">
+            すべて既読
           </Button>
         </form>
       </div>
@@ -46,21 +46,21 @@ export default async function NotificationsPage() {
               <Link
                 key={notification.id}
                 href={notification.postId ? `/post/${notification.postId}` : `/profile/${notification.actor.username}`}
-                className={`block border-b p-4 hover:bg-muted/50 transition-colors ${
+                className={`block border-b p-3 md:p-4 hover:bg-muted/50 transition-colors ${
                   !notification.read ? 'bg-blue-50/50' : ''
                 }`}
               >
-                <div className="flex gap-3">
+                <div className="flex gap-2 md:gap-3">
                   <div className="flex-shrink-0">
-                    {Icon && <Icon className="h-6 w-6 text-primary" />}
+                    {Icon && <Icon className="h-5 w-5 md:h-6 md:w-6 text-primary" />}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <Avatar className="h-8 w-8">
+                      <Avatar className="h-7 w-7 md:h-8 md:w-8">
                         <AvatarFallback>{notification.actor.name[0]}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm">
+                        <p className="text-xs md:text-sm">
                           <span className="font-bold">{notification.actor.name}</span>
                           {message}
                         </p>
@@ -73,7 +73,7 @@ export default async function NotificationsPage() {
                       </div>
                     </div>
                     {notification.post && (
-                      <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
+                      <p className="mt-2 text-xs md:text-sm text-muted-foreground line-clamp-2">
                         {notification.post.content}
                       </p>
                     )}
@@ -84,7 +84,7 @@ export default async function NotificationsPage() {
           })}
         </div>
       ) : (
-        <div className="p-8 text-center text-muted-foreground">
+        <div className="p-6 md:p-8 text-center text-muted-foreground text-sm md:text-base">
           通知はありません
         </div>
       )}

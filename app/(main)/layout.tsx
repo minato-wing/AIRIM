@@ -17,10 +17,10 @@ export default async function MainLayout({
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <main className="ml-64 flex-1 border-r">
+      <main className="flex-1 border-r md:ml-64 lg:ml-64 pt-14 pb-16 md:pt-0 md:pb-0">
         {children}
       </main>
-      <aside className="w-80 p-4">
+      <aside className="hidden xl:block xl:w-80 p-4">
         {/* Right sidebar for trends, suggestions, etc. */}
       </aside>
     </div>
