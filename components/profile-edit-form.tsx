@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Checkbox } from '@/components/ui/checkbox'
 import { updateProfile } from '@/lib/actions/profile'
 import { uploadProfileImage } from '@/lib/actions/upload'
 import { getAllTags } from '@/lib/actions/tag'
@@ -21,7 +21,7 @@ interface ProfileEditFormProps {
     bio: string
     avatar?: string | null
     header?: string | null
-    tagId?: string | null
+    tags?: Array<{ tag: { id: string; name: string; displayName: string } }>
   }
 }
 
@@ -35,8 +35,10 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
     bio: profile.bio,
     avatar: profile.avatar || '',
     header: profile.header || '',
-    tagId: profile.tagId || '',
   })
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>(
+    profile.tags?.map(pt => pt.tag.id) || []
+  )
   const [avatarPreview, setAvatarPreview] = useState(profile.avatar || '')
   const [headerPreview, setHeaderPreview] = useState(profile.header || '')
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
@@ -107,6 +109,16 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
     }
   }
 
+  const handleTagToggle = (tagId: string) => {
+    setSelectedTagIds(prev => {
+      if (prev.includes(tagId)) {
+        return prev.filter(id => id !== tagId)
+      } else {
+        return [...prev, tagId]
+      }
+    })
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
@@ -118,7 +130,7 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
         bio: formData.bio,
         avatar: formData.avatar || undefined,
         header: formData.header || undefined,
-        tagId: formData.tagId || null,
+        tagIds: selectedTagIds,
       })
       router.push(`/profile/${profile.username}`)
       router.refresh()
@@ -223,27 +235,21 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
         </div>
 
         <div>
-          <Label>タグ</Label>
-          <RadioGroup
-            value={formData.tagId}
-            onValueChange={(value) => setFormData({ ...formData, tagId: value })}
-            className="mt-2"
-          >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="" id="tag-none" />
-              <Label htmlFor="tag-none" className="font-normal cursor-pointer">
-                タグなし
-              </Label>
-            </div>
+          <Label>タグ（複数選択可）</Label>
+          <div className="mt-2 space-y-2">
             {tags.map((tag) => (
               <div key={tag.id} className="flex items-center space-x-2">
-                <RadioGroupItem value={tag.id} id={`tag-${tag.id}`} />
+                <Checkbox
+                  id={`tag-${tag.id}`}
+                  checked={selectedTagIds.includes(tag.id)}
+                  onCheckedChange={() => handleTagToggle(tag.id)}
+                />
                 <Label htmlFor={`tag-${tag.id}`} className="font-normal cursor-pointer">
                   {tag.displayName}
                 </Label>
               </div>
             ))}
-          </RadioGroup>
+          </div>
         </div>
 
         <div>

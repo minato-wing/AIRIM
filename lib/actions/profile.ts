@@ -72,36 +72,80 @@ export async function updateProfile(data: {
   bio?: string
   avatar?: string
   header?: string
-  tagId?: string | null
+  tagIds?: string[]
 }) {
   const { userId } = await auth()
   if (!userId) throw new Error('Unauthorized')
 
-  // tagIdが指定されている場合、存在確認
-  if (data.tagId !== undefined && data.tagId !== null) {
-    const tagExists = await prisma.tag.findUnique({
-      where: { id: data.tagId },
+  const profile = await prisma.profile.findUnique({
+    where: { clerkId: userId },
+  })
+
+  if (!profile) throw new Error('Profile not found')
+
+  // tagIdsが指定されている場合、存在確認
+  if (data.tagIds !== undefined && data.tagIds.length > 0) {
+    const tags = await prisma.tag.findMany({
+      where: { id: { in: data.tagIds } },
     })
-    if (!tagExists) {
+    if (tags.length !== data.tagIds.length) {
       throw new Error('指定されたタグが存在しません')
     }
   }
 
-  const profile = await prisma.profile.update({
+  // プロフィール基本情報を更新
+  const { tagIds, ...profileData } = data
+  const updatedProfile = await prisma.profile.update({
     where: { clerkId: userId },
-    data,
+    data: profileData,
   })
 
+  // タグの更新（tagIdsが指定されている場合のみ）
+  if (tagIds !== undefined) {
+    // 既存のタグをすべて削除
+    await prisma.profileTag.deleteMany({
+      where: { profileId: profile.id },
+    })
+
+    // 新しいタグを追加
+    if (tagIds.length > 0) {
+      await prisma.profileTag.createMany({
+        data: tagIds.map(tagId => ({
+          profileId: profile.id,
+          tagId,
+        })),
+      })
+    }
+  }
+
   revalidatePath('/profile')
-  revalidatePath(`/profile/${profile.username}`)
-  return profile
+  revalidatePath(`/profile/${updatedProfile.username}`)
+  return updatedProfile
 }
 
 export async function getProfileByUsername(username: string) {
   const profile = await prisma.profile.findUnique({
     where: { username },
-    include: {
-      tag: true,
+    select: {
+      id: true,
+      clerkId: true,
+      username: true,
+      name: true,
+      bio: true,
+      avatar: true,
+      header: true,
+      createdAt: true,
+      tags: {
+        select: {
+          tag: {
+            select: {
+              id: true,
+              name: true,
+              displayName: true,
+            },
+          },
+        },
+      },
       _count: {
         select: {
           followers: true,
@@ -121,8 +165,26 @@ export async function getCurrentProfile() {
 
   const profile = await prisma.profile.findUnique({
     where: { clerkId: userId },
-    include: {
-      tag: true,
+    select: {
+      id: true,
+      clerkId: true,
+      username: true,
+      name: true,
+      bio: true,
+      avatar: true,
+      header: true,
+      createdAt: true,
+      tags: {
+        select: {
+          tag: {
+            select: {
+              id: true,
+              name: true,
+              displayName: true,
+            },
+          },
+        },
+      },
       _count: {
         select: {
           followers: true,
@@ -141,9 +203,9 @@ export async function searchProfiles(params: {
   tagIds?: string[]
 }) {
   const { query, tagIds } = params
-  
+
   const whereConditions: any = {}
-  
+
   // テキスト検索条件
   if (query && query.trim()) {
     whereConditions.OR = [
@@ -151,16 +213,35 @@ export async function searchProfiles(params: {
       { name: { contains: query, mode: 'insensitive' } },
     ]
   }
-  
-  // タグ検索条件
+
+  // タグ検索条件（多対多リレーション）
   if (tagIds && tagIds.length > 0) {
-    whereConditions.tagId = { in: tagIds }
+    whereConditions.tags = {
+      some: {
+        tagId: { in: tagIds },
+      },
+    }
   }
-  
+
   const profiles = await prisma.profile.findMany({
     where: Object.keys(whereConditions).length > 0 ? whereConditions : undefined,
-    include: {
-      tag: true,
+    select: {
+      id: true,
+      username: true,
+      name: true,
+      bio: true,
+      avatar: true,
+      tags: {
+        select: {
+          tag: {
+            select: {
+              id: true,
+              name: true,
+              displayName: true,
+            },
+          },
+        },
+      },
     },
     take: 20,
   })
