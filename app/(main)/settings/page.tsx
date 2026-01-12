@@ -35,17 +35,17 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-4 space-y-6">
-      <h1 className="text-2xl font-bold">設定</h1>
+    <div className="w-full max-w-5xl mx-auto p-3 md:p-4 space-y-4 md:space-y-6 pb-20 md:pb-4">
+      <h1 className="text-xl md:text-2xl font-bold">設定</h1>
 
       <Card>
         <CardHeader>
-          <CardTitle>アカウント設定</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-lg md:text-xl">アカウント設定</CardTitle>
+          <CardDescription className="text-xs md:text-sm">
             メールアドレス、パスワードなどの基本設定
           </CardDescription>
         </CardHeader>
-        <CardContent className="min-w-full">
+        <CardContent className="min-w-full overflow-x-auto">
           <style jsx global>{`
             .cl-internal-shxxyl {
               display: none;
@@ -57,14 +57,14 @@ export default function SettingsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>通知設定</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-lg md:text-xl">通知設定</CardTitle>
+          <CardDescription className="text-xs md:text-sm">
             受け取る通知の種類を選択できます
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-3 md:space-y-4">
           <div className="flex items-center justify-between">
-            <Label htmlFor="onFollow">フォロー通知</Label>
+            <Label htmlFor="onFollow" className="text-sm md:text-base">フォロー通知</Label>
             <Switch
               id="onFollow"
               checked={settings.onFollow}
@@ -74,7 +74,7 @@ export default function SettingsPage() {
             />
           </div>
           <div className="flex items-center justify-between">
-            <Label htmlFor="onLike">いいね通知</Label>
+            <Label htmlFor="onLike" className="text-sm md:text-base">いいね通知</Label>
             <Switch
               id="onLike"
               checked={settings.onLike}
@@ -84,7 +84,7 @@ export default function SettingsPage() {
             />
           </div>
           <div className="flex items-center justify-between">
-            <Label htmlFor="onRepost">リポスト通知</Label>
+            <Label htmlFor="onRepost" className="text-sm md:text-base">リポスト通知</Label>
             <Switch
               id="onRepost"
               checked={settings.onRepost}
@@ -94,7 +94,7 @@ export default function SettingsPage() {
             />
           </div>
           <div className="flex items-center justify-between">
-            <Label htmlFor="onReply">返信通知</Label>
+            <Label htmlFor="onReply" className="text-sm md:text-base">返信通知</Label>
             <Switch
               id="onReply"
               checked={settings.onReply}
@@ -103,7 +103,7 @@ export default function SettingsPage() {
               }
             />
           </div>
-          <Button onClick={handleSave} disabled={loading} className="w-full">
+          <Button onClick={handleSave} disabled={loading} className="w-full text-sm md:text-base">
             {loading ? '保存中...' : '保存'}
           </Button>
         </CardContent>

@@ -60,25 +60,25 @@ export function PostCard({ post, currentUserId, showParent = false }: PostCardPr
   }
 
   return (
-    <article className="border-b p-4 hover:bg-muted/50 transition-colors">
-      <div className="flex gap-3">
+    <article className="border-b p-3 md:p-4 hover:bg-muted/50 transition-colors">
+      <div className="flex gap-2 md:gap-3">
         <Link href={`/profile/${post.author.username}`}>
-          <Avatar>
+          <Avatar className="h-10 w-10 md:h-12 md:w-12">
             <AvatarImage src={post.author.avatar || undefined} />
             <AvatarFallback>{post.author.name[0]}</AvatarFallback>
           </Avatar>
         </Link>
         
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <Link href={`/profile/${post.author.username}`} className="font-bold hover:underline">
+          <div className="flex items-center gap-1 md:gap-2 flex-wrap">
+            <Link href={`/profile/${post.author.username}`} className="font-bold hover:underline text-sm md:text-base truncate max-w-[120px] md:max-w-none">
               {post.author.name}
             </Link>
-            <Link href={`/profile/${post.author.username}`} className="text-muted-foreground text-sm">
+            <Link href={`/profile/${post.author.username}`} className="text-muted-foreground text-xs md:text-sm truncate max-w-[100px] md:max-w-none">
               @{post.author.username}
             </Link>
-            <span className="text-muted-foreground text-sm">·</span>
-            <span className="text-muted-foreground text-sm">
+            <span className="text-muted-foreground text-xs md:text-sm hidden sm:inline">·</span>
+            <span className="text-muted-foreground text-xs md:text-sm hidden sm:inline">
               {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true, locale: ja })}
             </span>
             {isOwnPost && (
@@ -86,7 +86,7 @@ export function PostCard({ post, currentUserId, showParent = false }: PostCardPr
                 variant="ghost"
                 size="sm"
                 onClick={handleDelete}
-                className="ml-auto"
+                className="ml-auto p-1 h-auto"
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
@@ -103,39 +103,39 @@ export function PostCard({ post, currentUserId, showParent = false }: PostCardPr
                     key={index}
                     src={url}
                     alt={`Image ${index + 1}`}
-                    className="rounded-lg object-cover w-full h-64"
+                    className="rounded-lg object-cover w-full h-48 md:h-64"
                   />
                 ))}
               </div>
             )}
           </Link>
 
-          <div className="mt-3 flex items-center gap-6">
+          <div className="mt-2 md:mt-3 flex items-center gap-2 md:gap-6">
             <Link href={`/post/${post.id}`}>
-              <Button variant="ghost" size="sm" className="gap-2">
+              <Button variant="ghost" size="sm" className="gap-1 md:gap-2 p-1 md:p-2 h-auto">
                 <MessageCircle className="h-4 w-4" />
-                <span className="text-sm">{post._count?.replies || 0}</span>
+                <span className="text-xs md:text-sm">{post._count?.replies || 0}</span>
               </Button>
             </Link>
 
             <Button
               variant="ghost"
               size="sm"
-              className={`gap-2 ${isReposted ? 'text-green-500' : ''}`}
+              className={`gap-1 md:gap-2 p-1 md:p-2 h-auto ${isReposted ? 'text-green-500' : ''}`}
               onClick={handleRepost}
             >
               <Repeat2 className="h-4 w-4" />
-              <span className="text-sm">{repostCount}</span>
+              <span className="text-xs md:text-sm">{repostCount}</span>
             </Button>
 
             <Button
               variant="ghost"
               size="sm"
-              className={`gap-2 ${isLiked ? 'text-yellow-500' : ''}`}
+              className={`gap-1 md:gap-2 p-1 md:p-2 h-auto ${isLiked ? 'text-yellow-500' : ''}`}
               onClick={handleLike}
             >
               <Star className={`h-4 w-4 ${isLiked ? 'fill-current' : ''}`} />
-              <span className="text-sm">{likeCount}</span>
+              <span className="text-xs md:text-sm">{likeCount}</span>
             </Button>
           </div>
         </div>

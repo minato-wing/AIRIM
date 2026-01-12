@@ -142,18 +142,18 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
       {error && (
-        <div className="bg-destructive/10 text-destructive px-4 py-3 rounded">
+        <div className="bg-destructive/10 text-destructive px-3 md:px-4 py-2 md:py-3 rounded text-sm md:text-base">
           {error}
         </div>
       )}
 
-      <div className="space-y-4">
+      <div className="space-y-3 md:space-y-4">
         <div>
-          <Label>ヘッダー画像</Label>
+          <Label className="text-sm md:text-base">ヘッダー画像</Label>
           <div className="mt-2 relative">
-            <div className="w-full h-48 bg-muted rounded-lg overflow-hidden relative">
+            <div className="w-full h-32 md:h-48 bg-muted rounded-lg overflow-hidden relative">
               {headerPreview ? (
                 <img
                   src={headerPreview}
@@ -162,7 +162,7 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <ImageIcon className="h-12 w-12 text-muted-foreground" />
+                  <ImageIcon className="h-8 w-8 md:h-12 md:w-12 text-muted-foreground" />
                 </div>
               )}
               <button
@@ -171,7 +171,7 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
                 disabled={uploadingHeader}
                 className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity"
               >
-                <Camera className="h-8 w-8 text-white" />
+                <Camera className="h-6 w-6 md:h-8 md:w-8 text-white" />
               </button>
             </div>
             <input
@@ -185,10 +185,10 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
         </div>
 
         <div>
-          <Label>アイコン画像</Label>
-          <div className="mt-2 flex items-center gap-4">
+          <Label className="text-sm md:text-base">アイコン画像</Label>
+          <div className="mt-2 flex items-center gap-3 md:gap-4">
             <div className="relative">
-              <Avatar className="h-24 w-24">
+              <Avatar className="h-16 w-16 md:h-24 md:w-24">
                 <AvatarImage src={avatarPreview} />
                 <AvatarFallback>{formData.name[0]}</AvatarFallback>
               </Avatar>
@@ -198,7 +198,7 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
                 disabled={uploadingAvatar}
                 className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity"
               >
-                <Camera className="h-6 w-6 text-white" />
+                <Camera className="h-5 w-5 md:h-6 md:w-6 text-white" />
               </button>
             </div>
             <input
@@ -208,34 +208,36 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
               onChange={handleAvatarChange}
               className="hidden"
             />
-            <div className="text-sm text-muted-foreground">
+            <div className="text-xs md:text-sm text-muted-foreground">
               クリックして画像を変更
             </div>
           </div>
         </div>
 
         <div>
-          <Label htmlFor="name">表示名</Label>
+          <Label htmlFor="name" className="text-sm md:text-base">表示名</Label>
           <Input
             id="name"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             required
+            className="text-sm md:text-base"
           />
         </div>
 
         <div>
-          <Label htmlFor="bio">自己紹介</Label>
+          <Label htmlFor="bio" className="text-sm md:text-base">自己紹介</Label>
           <Textarea
             id="bio"
             value={formData.bio}
             onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
             rows={4}
+            className="text-sm md:text-base"
           />
         </div>
 
         <div>
-          <Label>タグ（複数選択可）</Label>
+          <Label className="text-sm md:text-base">タグ（複数選択可）</Label>
           <div className="mt-2 space-y-2">
             {tags.map((tag) => (
               <div key={tag.id} className="flex items-center space-x-2">
@@ -244,7 +246,7 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
                   checked={selectedTagIds.includes(tag.id)}
                   onCheckedChange={() => handleTagToggle(tag.id)}
                 />
-                <Label htmlFor={`tag-${tag.id}`} className="font-normal cursor-pointer">
+                <Label htmlFor={`tag-${tag.id}`} className="font-normal cursor-pointer text-xs md:text-sm">
                   {tag.displayName}
                 </Label>
               </div>
@@ -253,16 +255,16 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
         </div>
 
         <div>
-          <Label>ユーザーID</Label>
-          <Input value={`@${profile.username}`} disabled />
-          <p className="text-sm text-muted-foreground mt-1">
+          <Label className="text-sm md:text-base">ユーザーID</Label>
+          <Input value={`@${profile.username}`} disabled className="text-sm md:text-base" />
+          <p className="text-xs md:text-sm text-muted-foreground mt-1">
             ユーザーIDは変更できません
           </p>
         </div>
       </div>
 
-      <div className="flex gap-2">
-        <Button type="submit" disabled={isLoading || uploadingAvatar || uploadingHeader}>
+      <div className="flex flex-col sm:flex-row gap-2">
+        <Button type="submit" disabled={isLoading || uploadingAvatar || uploadingHeader} className="w-full sm:w-auto text-sm md:text-base">
           {isLoading ? '保存中...' : '保存'}
         </Button>
         <Button
@@ -270,6 +272,7 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
           variant="outline"
           onClick={() => router.back()}
           disabled={isLoading}
+          className="w-full sm:w-auto text-sm md:text-base"
         >
           キャンセル
         </Button>

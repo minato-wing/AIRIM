@@ -84,41 +84,41 @@ export function PostForm({ parentId, onSuccess, placeholder = '今何してる�
   const isOverLimit = charCount > 200
 
   return (
-    <form onSubmit={handleSubmit} className="border-b p-4">
-      <div className="flex gap-3">
-        <Avatar>
+    <form onSubmit={handleSubmit} className="border-b p-3 md:p-4">
+      <div className="flex gap-2 md:gap-3">
+        <Avatar className="h-10 w-10 md:h-12 md:w-12">
           <AvatarFallback>U</AvatarFallback>
         </Avatar>
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <Textarea
             placeholder={placeholder}
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="min-h-[100px] resize-none border-0 p-0 focus-visible:ring-0"
+            className="min-h-[80px] md:min-h-[100px] resize-none border-0 p-0 focus-visible:ring-0 text-sm md:text-base"
           />
           
           {images.length > 0 && (
-            <div className="mt-3 grid grid-cols-2 gap-2">
+            <div className="mt-2 md:mt-3 grid grid-cols-2 gap-2">
               {images.map((url, index) => (
                 <div key={index} className="relative">
                   <img
                     src={url}
                     alt={`Upload ${index + 1}`}
-                    className="rounded-lg object-cover w-full h-40"
+                    className="rounded-lg object-cover w-full h-32 md:h-40"
                   />
                   <button
                     type="button"
                     onClick={() => removeImage(index)}
-                    className="absolute top-2 right-2 bg-black/50 rounded-full p-1 hover:bg-black/70"
+                    className="absolute top-1 right-1 md:top-2 md:right-2 bg-black/50 rounded-full p-1 hover:bg-black/70"
                   >
-                    <X className="h-4 w-4 text-white" />
+                    <X className="h-3 w-3 md:h-4 md:w-4 text-white" />
                   </button>
                 </div>
               ))}
             </div>
           )}
 
-          <div className="mt-3 flex items-center justify-between">
+          <div className="mt-2 md:mt-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <label className="cursor-pointer">
                 <input
@@ -137,18 +137,20 @@ export function PostForm({ parentId, onSuccess, placeholder = '今何してる�
                   asChild
                 >
                   <span>
-                    <ImagePlus className="h-5 w-5" />
+                    <ImagePlus className="h-4 w-4 md:h-5 md:w-5" />
                   </span>
                 </Button>
               </label>
             </div>
-            <div className="flex items-center gap-3">
-              <span className={`text-sm ${isOverLimit ? 'text-red-500' : 'text-muted-foreground'}`}>
+            <div className="flex items-center gap-2 md:gap-3">
+              <span className={`text-xs md:text-sm ${isOverLimit ? 'text-red-500' : 'text-muted-foreground'}`}>
                 {charCount}/200
               </span>
               <Button
                 type="submit"
                 variant="secondary"
+                size="sm"
+                className="md:size-default"
                 disabled={loading || uploading || isOverLimit || (!content.trim() && images.length === 0)}
               >
                 {loading ? '投稿中...' : '投稿'}

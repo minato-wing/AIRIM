@@ -58,10 +58,10 @@ export default async function UserProfilePage({
   })
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="w-full max-w-2xl mx-auto pb-20 md:pb-0">
       <div className="border-b">
         {/* Header Image */}
-        <div className="w-full h-48 bg-muted relative">
+        <div className="w-full h-32 md:h-48 bg-muted relative">
           {profile.header ? (
             <img
               src={profile.header}
@@ -70,23 +70,23 @@ export default async function UserProfilePage({
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <ImageIcon className="h-12 w-12 text-muted-foreground" />
+              <ImageIcon className="h-8 w-8 md:h-12 md:w-12 text-muted-foreground" />
             </div>
           )}
         </div>
 
         {/* Profile Info */}
-        <div className="p-6">
-          <div className="flex items-start gap-4 -mt-16 mb-4">
-            <Avatar className="h-24 w-24 border-4 border-background">
+        <div className="p-3 md:p-6">
+          <div className="flex items-start gap-2 md:gap-4 -mt-12 md:-mt-16 mb-4">
+            <Avatar className="h-16 w-16 md:h-24 md:w-24 border-4 border-background">
               <AvatarImage src={profile.avatar || undefined} />
               <AvatarFallback>{profile.name[0]}</AvatarFallback>
             </Avatar>
-            <div className="flex-1 mt-16">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-2xl font-bold">{profile.name}</h1>
-                  <p className="text-muted-foreground">@{profile.username}</p>
+            <div className="flex-1 mt-12 md:mt-16">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                <div className="flex-1 min-w-0">
+                  <h1 className="text-xl md:text-2xl font-bold truncate">{profile.name}</h1>
+                  <p className="text-muted-foreground text-sm md:text-base truncate">@{profile.username}</p>
                   {profile.tags && profile.tags.length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-1">
                       {profile.tags.map((pt) => (
@@ -97,7 +97,7 @@ export default async function UserProfilePage({
                 </div>
                 {isOwnProfile ? (
                   <Link href="/profile/edit">
-                    <Button variant="outline">プロフィール編集</Button>
+                    <Button variant="outline" size="sm" className="w-full md:w-auto">プロフィール編集</Button>
                   </Link>
                 ) : currentProfile ? (
                   <FollowButton profileId={profile.id} />
@@ -105,8 +105,8 @@ export default async function UserProfilePage({
               </div>
             </div>
           </div>
-          <p className="mt-3">{profile.bio}</p>
-          <div className="mt-3 flex gap-4 text-sm">
+          <p className="mt-3 text-sm md:text-base break-words">{profile.bio}</p>
+          <div className="mt-3 flex gap-3 md:gap-4 text-xs md:text-sm">
             <span>
               <strong>{profile._count?.following || 0}</strong> フォロー中
             </span>

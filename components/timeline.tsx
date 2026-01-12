@@ -15,10 +15,10 @@ export function Timeline({ globalPosts, followingPosts, currentUserId }: Timelin
   return (
     <Tabs defaultValue="global" className="w-full">
       <TabsList className="w-full rounded-none border-b">
-        <TabsTrigger value="following" className="flex-1">
+        <TabsTrigger value="following" className="flex-1 text-xs md:text-sm">
           フォロー中
         </TabsTrigger>
-        <TabsTrigger value="global" className="flex-1">
+        <TabsTrigger value="global" className="flex-1 text-xs md:text-sm">
           全体
         </TabsTrigger>
       </TabsList>
@@ -35,7 +35,7 @@ export function Timeline({ globalPosts, followingPosts, currentUserId }: Timelin
             <PostCard key={post.id} post={post} currentUserId={currentUserId} />
           ))
         ) : (
-          <div className="p-8 text-center text-muted-foreground">
+          <div className="p-6 md:p-8 text-center text-muted-foreground text-sm md:text-base">
             フォローしているユーザーの投稿がありません
           </div>
         )}
