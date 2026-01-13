@@ -54,23 +54,23 @@ export default function ProfileSetupPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4 bg-muted/50">
+    <div className="flex min-h-screen items-center justify-center p-3 md:p-4 bg-muted/50">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>プロフィール設定</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-lg md:text-xl">プロフィール設定</CardTitle>
+          <CardDescription className="text-xs md:text-sm">
             AIRIM へようこそ！アカウント情報を入力してください
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
             {error && (
-              <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm">
+              <div className="bg-red-50 text-red-600 p-2 md:p-3 rounded-md text-xs md:text-sm">
                 {error}
               </div>
             )}
             <div>
-              <label className="text-sm font-medium">
+              <label className="text-xs md:text-sm font-medium">
                 ユーザーID <span className="text-red-500">*</span>
               </label>
               <Input
@@ -79,13 +79,14 @@ export default function ProfileSetupPage() {
                 onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                 required
                 maxLength={30}
+                className="text-sm md:text-base"
               />
               <p className="text-xs text-muted-foreground mt-1">
                 英数字とアンダースコア(_)のみ使用可能
               </p>
             </div>
             <div>
-              <label className="text-sm font-medium">
+              <label className="text-xs md:text-sm font-medium">
                 表示名 <span className="text-red-500">*</span>
               </label>
               <Input
@@ -94,22 +95,24 @@ export default function ProfileSetupPage() {
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
                 maxLength={50}
+                className="text-sm md:text-base"
               />
             </div>
             <div>
-              <label className="text-sm font-medium">自己紹介（任意）</label>
+              <label className="text-xs md:text-sm font-medium">自己紹介（任意）</label>
               <Textarea
                 placeholder="自己紹介を入力..."
                 value={formData.bio}
                 onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                 rows={4}
                 maxLength={200}
+                className="text-sm md:text-base"
               />
               <p className="text-xs text-muted-foreground mt-1">
                 {formData.bio.length}/200
               </p>
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full text-sm md:text-base" disabled={loading}>
               {loading ? '作成中...' : 'プロフィールを作成'}
             </Button>
           </form>

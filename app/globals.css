@@ -123,3 +123,13 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  /* Mobile spacing adjustments */
+  .mobile-safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  .mobile-safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
