@@ -8,7 +8,7 @@ export default async function HomePage() {
   const currentProfile = await getCurrentProfile()
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="w-full max-w-2xl mx-auto pb-20 md:pb-0">
       <div className="border-b">
         <h2 className="text-xl font-bold p-4">ホーム</h2>
       </div>
