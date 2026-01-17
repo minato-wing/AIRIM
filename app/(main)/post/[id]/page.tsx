@@ -2,11 +2,9 @@ import { notFound } from 'next/navigation'
 import { getPost } from '@/lib/actions/post'
 import { getCurrentProfile } from '@/lib/actions/profile'
 import { PostCard } from '@/components/post-card'
-import { PostForm } from '@/components/post-form'
+import { PostDetailContent } from '@/components/post-detail-content'
 import { Separator } from '@/components/ui/separator'
-
-type Post = NonNullable<Awaited<ReturnType<typeof getPost>>>
-type Reply = Post['replies'][number]
+import type { PostWithAuthor } from '@/lib/types'
 
 export default async function PostDetailPage({
   params,
@@ -32,7 +30,7 @@ export default async function PostDetailPage({
       {post.parent && (
         <>
           <PostCard
-            post={post.parent}
+            post={post.parent as PostWithAuthor}
             currentUserId={currentProfile?.id}
           />
           <div className="px-3 md:px-4">
@@ -42,34 +40,19 @@ export default async function PostDetailPage({
       )}
 
       <PostCard
-        post={post}
+        post={post as PostWithAuthor}
         currentUserId={currentProfile?.id}
       />
 
       <Separator />
 
-      <div className="p-3 md:p-4">
-        <h3 className="font-bold mb-3 md:mb-4 text-sm md:text-base">返信</h3>
-        <PostForm parentId={post.id} placeholder="返信を投稿" />
-      </div>
-
-      <Separator />
-
-      {post.replies && post.replies.length > 0 ? (
-        <div>
-          {post.replies.map((reply: Reply) => (
-            <PostCard
-              key={reply.id}
-              post={reply}
-              currentUserId={currentProfile?.id}
-            />
-          ))}
-        </div>
-      ) : (
-        <div className="p-6 md:p-8 text-center text-muted-foreground text-sm md:text-base">
-          まだ返信がありません
-        </div>
-      )}
+      <PostDetailContent
+        postId={post.id}
+        initialReplies={post.replies as PostWithAuthor[]}
+        currentUserId={currentProfile?.id}
+        userAvatar={currentProfile?.avatar}
+        userName={currentProfile?.name}
+      />
     </div>
   )
 }

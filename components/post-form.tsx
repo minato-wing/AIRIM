@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ImagePlus, X } from 'lucide-react'
 import { createPost } from '@/lib/actions/post'
 import { uploadImage } from '@/lib/actions/upload'
@@ -14,9 +14,11 @@ interface PostFormProps {
   parentId?: string
   onSuccess?: () => void
   placeholder?: string
+  userAvatar?: string | null
+  userName?: string
 }
 
-export function PostForm({ parentId, onSuccess, placeholder = '今何してる？' }: PostFormProps) {
+export function PostForm({ parentId, onSuccess, placeholder = '今何してる？', userAvatar, userName }: PostFormProps) {
   const router = useRouter()
   const [content, setContent] = useState('')
   const [images, setImages] = useState<string[]>([])
@@ -88,7 +90,8 @@ export function PostForm({ parentId, onSuccess, placeholder = '今何してる�
     <form onSubmit={handleSubmit} className="border-b p-3 md:p-4">
       <div className="flex gap-2 md:gap-3">
         <Avatar className="h-10 w-10 md:h-12 md:w-12">
-          <AvatarFallback>U</AvatarFallback>
+          <AvatarImage src={userAvatar || undefined} />
+          <AvatarFallback>{userName?.[0] || 'U'}</AvatarFallback>
         </Avatar>
         <div className="flex-1 min-w-0">
           <Textarea

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback, forwardRef, useImperativeHandle } from 'react'
 import { Timeline } from '@/components/timeline'
 import { Loader2 } from 'lucide-react'
 import type { PostWithAuthor } from '@/lib/types'
@@ -10,13 +10,17 @@ interface TimelineLoaderProps {
   currentUserId?: string
 }
 
-export function TimelineLoader({ currentUserId }: TimelineLoaderProps) {
-  const [globalPosts, setGlobalPosts] = useState<PostWithAuthor[]>([])
-  const [followingPosts, setFollowingPosts] = useState<PostWithAuthor[]>([])
-  const [loading, setLoading] = useState(true)
+export interface TimelineLoaderRef {
+  refresh: () => Promise<void>
+}
 
-  useEffect(() => {
-    const fetchTimelines = async () => {
+export const TimelineLoader = forwardRef<TimelineLoaderRef, TimelineLoaderProps>(
+  function TimelineLoader({ currentUserId }, ref) {
+    const [globalPosts, setGlobalPosts] = useState<PostWithAuthor[]>([])
+    const [followingPosts, setFollowingPosts] = useState<PostWithAuthor[]>([])
+    const [loading, setLoading] = useState(true)
+
+    const fetchTimelines = useCallback(async () => {
       try {
         setLoading(true)
         const [global, following] = await Promise.all([
@@ -30,24 +34,30 @@ export function TimelineLoader({ currentUserId }: TimelineLoaderProps) {
       } finally {
         setLoading(false)
       }
+    }, [])
+
+    useImperativeHandle(ref, () => ({
+      refresh: fetchTimelines,
+    }), [fetchTimelines])
+
+    useEffect(() => {
+      fetchTimelines()
+    }, [fetchTimelines])
+
+    if (loading) {
+      return (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      )
     }
 
-    fetchTimelines()
-  }, [])
-
-  if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
+      <Timeline
+        globalPosts={globalPosts}
+        followingPosts={followingPosts}
+        currentUserId={currentUserId}
+      />
     )
   }
-
-  return (
-    <Timeline
-      globalPosts={globalPosts}
-      followingPosts={followingPosts}
-      currentUserId={currentUserId}
-    />
-  )
-}
+)

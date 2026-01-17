@@ -22,13 +22,13 @@ export const Timeline = memo(function Timeline({ globalPosts, followingPosts, cu
           全体
         </TabsTrigger>
       </TabsList>
-      
+
       <TabsContent value="global" className="mt-0">
         {globalPosts.map((post) => (
           <PostCard key={post.id} post={post} currentUserId={currentUserId} />
         ))}
       </TabsContent>
-      
+
       <TabsContent value="following" className="mt-0">
         {followingPosts.length > 0 ? (
           followingPosts.map((post) => (

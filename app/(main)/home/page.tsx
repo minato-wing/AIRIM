@@ -1,5 +1,4 @@
-import { PostForm } from '@/components/post-form'
-import { TimelineLoader } from '@/components/timeline-loader'
+import { HomeContent } from '@/components/home-content'
 import { getCurrentProfile } from '@/lib/actions/profile'
 
 export const revalidate = 10 // Cache for 10 seconds
@@ -13,9 +12,11 @@ export default async function HomePage() {
         <h2 className="text-xl font-bold p-4">ホーム</h2>
       </div>
       
-      <PostForm />
-      
-      <TimelineLoader currentUserId={currentProfile?.id} />
+      <HomeContent
+        currentUserId={currentProfile?.id}
+        userAvatar={currentProfile?.avatar}
+        userName={currentProfile?.name}
+      />
     </div>
   )
 }
