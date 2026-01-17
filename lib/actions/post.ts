@@ -103,6 +103,56 @@ export async function deletePost(postId: string) {
   revalidatePath(`/profile/${profile.username}`)
 }
 
+export async function getReplies(postId: string) {
+  const { userId } = await auth()
+  
+  const profile = userId ? await prisma.profile.findUnique({
+    where: { clerkId: userId },
+    select: { id: true },
+  }) : null
+
+  const replies = await prisma.post.findMany({
+    where: { parentId: postId },
+    select: {
+      id: true,
+      content: true,
+      images: true,
+      authorId: true,
+      createdAt: true,
+      author: {
+        select: {
+          id: true,
+          username: true,
+          name: true,
+          avatar: true,
+        },
+      },
+      likes: profile ? {
+        where: { userId: profile.id },
+        select: { userId: true },
+      } : false,
+      reposts: profile ? {
+        where: { userId: profile.id },
+        select: { userId: true },
+      } : false,
+      _count: {
+        select: {
+          likes: true,
+          reposts: true,
+          replies: true,
+        },
+      },
+    },
+    orderBy: { createdAt: 'asc' },
+  })
+
+  return replies.map(reply => ({
+    ...reply,
+    likes: reply.likes || [],
+    reposts: reply.reposts || [],
+  }))
+}
+
 export async function getPost(postId: string) {
   const { userId } = await auth()
   

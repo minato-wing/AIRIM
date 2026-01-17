@@ -16,19 +16,19 @@ export const Timeline = memo(function Timeline({ globalPosts, followingPosts, cu
     <Tabs defaultValue="global" className="w-full">
       <TabsList className="w-full rounded-none border-b">
         <TabsTrigger value="following" className="flex-1 text-xs md:text-sm">
-          フォロー中
+          フォロー中+自分
         </TabsTrigger>
         <TabsTrigger value="global" className="flex-1 text-xs md:text-sm">
           全体
         </TabsTrigger>
       </TabsList>
-      
+
       <TabsContent value="global" className="mt-0">
         {globalPosts.map((post) => (
           <PostCard key={post.id} post={post} currentUserId={currentUserId} />
         ))}
       </TabsContent>
-      
+
       <TabsContent value="following" className="mt-0">
         {followingPosts.length > 0 ? (
           followingPosts.map((post) => (
