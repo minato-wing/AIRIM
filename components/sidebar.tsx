@@ -67,7 +67,10 @@ export function Sidebar() {
         <nav className="flex-1 space-y-2 text-white">
           {navItems.map((item) => {
             const Icon = item.icon
-            const isActive = pathname === item.href
+            // /profile は /profile/[username] にリダイレクトされるため startsWith で判定
+            const isActive = item.href === '/profile'
+              ? pathname.startsWith('/profile')
+              : pathname === item.href
             
             return (
               <Link key={item.href} href={item.href} onClick={closeMobileMenu}>
