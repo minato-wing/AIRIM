@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -100,16 +101,18 @@ export function PostForm({ parentId, onSuccess, placeholder = '今何してる�
           {images.length > 0 && (
             <div className="mt-2 md:mt-3 grid grid-cols-2 gap-2">
               {images.map((url, index) => (
-                <div key={index} className="relative">
-                  <img
+                <div key={index} className="relative w-full h-32 md:h-40">
+                  <Image
                     src={url}
                     alt={`Upload ${index + 1}`}
-                    className="rounded-lg object-cover w-full h-32 md:h-40"
+                    fill
+                    className="rounded-lg object-cover"
+                    sizes="(max-width: 768px) 50vw, 25vw"
                   />
                   <button
                     type="button"
                     onClick={() => removeImage(index)}
-                    className="absolute top-1 right-1 md:top-2 md:right-2 bg-black/50 rounded-full p-1 hover:bg-black/70"
+                    className="absolute top-1 right-1 md:top-2 md:right-2 bg-black/50 rounded-full p-1 hover:bg-black/70 z-10"
                   >
                     <X className="h-3 w-3 md:h-4 md:w-4 text-white" />
                   </button>

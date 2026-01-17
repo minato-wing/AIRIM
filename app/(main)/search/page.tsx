@@ -11,7 +11,7 @@ import { TagBadge } from '@/components/tag-badge'
 import { searchProfiles } from '@/lib/actions/profile'
 import { getAllTags } from '@/lib/actions/tag'
 import { Search as SearchIcon } from 'lucide-react'
-import type { Profile, Tag } from '@prisma/client'
+import type { Tag } from '@prisma/client'
 
 type ProfileWithTag = {
   id: string

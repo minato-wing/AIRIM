@@ -1,22 +1,19 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useCallback, memo } from 'react'
 import { Button } from '@/components/ui/button'
-import { toggleFollow, isFollowing } from '@/lib/actions/interaction'
+import { toggleFollow } from '@/lib/actions/interaction'
 
 interface FollowButtonProps {
   profileId: string
+  initialFollowing?: boolean
 }
 
-export function FollowButton({ profileId }: FollowButtonProps) {
-  const [following, setFollowing] = useState(false)
+export const FollowButton = memo(function FollowButton({ profileId, initialFollowing = false }: FollowButtonProps) {
+  const [following, setFollowing] = useState(initialFollowing)
   const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    isFollowing(profileId).then(setFollowing)
-  }, [profileId])
-
-  const handleClick = async () => {
+  const handleClick = useCallback(async () => {
     setLoading(true)
     try {
       const newState = await toggleFollow(profileId)
@@ -26,7 +23,7 @@ export function FollowButton({ profileId }: FollowButtonProps) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [profileId])
 
   return (
     <Button
@@ -37,4 +34,4 @@ export function FollowButton({ profileId }: FollowButtonProps) {
       {following ? 'フォロー中' : 'フォロー'}
     </Button>
   )
-}
+})

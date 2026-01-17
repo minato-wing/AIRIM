@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { memo } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { PostCard } from '@/components/post-card'
 import { PostWithAuthor } from '@/lib/types'
@@ -11,7 +11,7 @@ interface TimelineProps {
   currentUserId?: string
 }
 
-export function Timeline({ globalPosts, followingPosts, currentUserId }: TimelineProps) {
+export const Timeline = memo(function Timeline({ globalPosts, followingPosts, currentUserId }: TimelineProps) {
   return (
     <Tabs defaultValue="global" className="w-full">
       <TabsList className="w-full rounded-none border-b">
@@ -42,4 +42,4 @@ export function Timeline({ globalPosts, followingPosts, currentUserId }: Timelin
       </TabsContent>
     </Tabs>
   )
-}
+})
