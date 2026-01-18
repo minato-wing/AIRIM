@@ -12,13 +12,15 @@ function createPrismaClient() {
   if (!connectionString) {
     throw new Error('DATABASE_URL is not defined')
   }
+  console.log("start pooling")
 
   const pool = new Pool({
     connectionString,
-    max: parseInt(process.env.DATABASE_POOL_MAX || '10', 10),
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 2000,
+    max: parseInt(process.env.DATABASE_POOL_MAX || '5', 10),
+    idleTimeoutMillis: 20000,
+    connectionTimeoutMillis: 5000,
   })
+  console.log("end of pooling")
   const adapter = new PrismaPg(pool)
 
   return new PrismaClient({

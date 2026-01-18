@@ -7,9 +7,9 @@ async function runMigrations() {
     console.log('🔄 Checking database migrations...')
     
     // Run prisma migrate deploy (production-safe, only applies pending migrations)
+    // prisma.config.ts handles using DIRECT_URL for migrations
     execSync('npx prisma migrate deploy', {
       stdio: 'inherit',
-      env: process.env,
     })
     
     console.log('✅ Database migrations completed successfully')
